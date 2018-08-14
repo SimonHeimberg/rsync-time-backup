@@ -306,11 +306,13 @@ if [ -n "$(fn_find "$INPROGRESS_FILE")" ]; then
 			exit 1
 		fi
 	else
+		PSFLAGS=''
+
 		RUNNINGPID="$(fn_run_cmd "cat $INPROGRESS_FILE")"
-		if [ "$RUNNINGPID" = "$(pgrep -o -f "$APPNAME")" ]; then
-			fn_log_error "Previous backup task is still active - aborting."
-			exit 1
-		fi
+		if ps -${PSFLAGS}p "$RUNNINGPID" -o "command" | grep "$APPNAME" > /dev/null; then
+                        fn_log_error "Previous backup task is still active - aborting."
+                        exit 1
+                fi
 	fi
 
 	if [ -n "$PREVIOUS_DEST" ]; then
